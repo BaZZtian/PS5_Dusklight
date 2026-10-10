@@ -150,6 +150,9 @@ dusklight="$root/vendor/dusklight"
 if [[ " ${objects[*]} " == *libaurora_main.a* ]]; then
     rm -rf "$app/res"
     cp -R "$dusklight/res" "$app/res"
+    # ... with the port's own pictures over Dusklight's, which show the game
+    # (ps5/art/make-title-art.py draws them)
+    cp "$ps5"/art/res/*.png "$app/res/"
 fi
 # The licences beside eboot.bin
 mkdir -p "$app/licenses"

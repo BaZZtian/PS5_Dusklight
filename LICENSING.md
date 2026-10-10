@@ -50,7 +50,9 @@ make the source of every part available at the revisions it was built from.
   can only give away what is theirs. The code is a reimplementation derived from
   a decompilation of Nintendo's game; whether and where that is lawful to use or
   share is not something these licences settle.
-- **Artwork.** `ps5/sce_sys/icon0.png`, `pic0.dds` and `pic1.dds` are drawn by
+- **Artwork.** `ps5/sce_sys/icon0.png`, `pic0.dds`, `pic1.dds` and the menu
+  pictures in `ps5/art/res/` (which a built title carries in place of
+  Dusklight's own logo, icon, emblem and pre-launch background) are drawn by
   `ps5/art/make-title-art.py`: a generated landscape, the lettering of
   Dusklight's logo (CC0, without its mascot), and Aurora's own mark. Nothing in
   them is Nintendo's.
