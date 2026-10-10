@@ -1,6 +1,7 @@
 # Dusklight for PlayStation 5
 
 [![stars](https://img.shields.io/github/stars/griches/PS5_Dusklight?style=flat)](https://github.com/griches/PS5_Dusklight/stargazers)
+[![release](https://img.shields.io/github/v/release/griches/PS5_Dusklight)](https://github.com/griches/PS5_Dusklight/releases/latest)
 [![Track Dusklight](https://github.com/griches/PS5_Dusklight/actions/workflows/track-dusklight.yml/badge.svg)](https://github.com/griches/PS5_Dusklight/actions/workflows/track-dusklight.yml)
 [![licence](https://img.shields.io/badge/licence-GPL--3.0%20as%20built-blue)](LICENSING.md)
 
@@ -46,8 +47,10 @@ Known limits:
 
 ## Install
 
-There is no ready-made download yet: you build the title folder (below), then
-install it like any other folder title.
+Download `Dusklight-PS5-vX.Y.Z.zip` from the
+[latest release](https://github.com/griches/PS5_Dusklight/releases/latest) and
+unpack it: it holds one folder, `PPSA99305`. (Or build that folder yourself, see
+Build.) It contains no game data.
 
 **What the console needs**
 
@@ -58,7 +61,7 @@ install it like any other folder title.
 
 **Steps**
 
-1. Build the title (see Build). The result is the folder `dist/PPSA99305/`.
+1. Unpack the release (or build: the result is the folder `dist/PPSA99305/`).
 2. Copy that whole folder to the console as `/data/homebrew/PPSA99305/`, so that
    you have:
 
@@ -133,6 +136,7 @@ Other tools, all in `ps5/tools/`:
 | --- | --- |
 | `deploy.sh` | Uploads `dist/PPSA99305/` over FTP (the console's address is `PS5_HOST` in `PS5_Vulkan/.env`). It never touches the disc image or `userdata/`. |
 | `run.sh` | Launches the title through PS5_Vulkan's control payload and follows its log; symbolises a crash. |
+| `package-release.sh VERSION` | Packs `dist/PPSA99305/` as a release zip with `SOURCE.txt`, the revision of every part. Refuses if a disc image or a save is in the folder. |
 | `build-triangle.sh` | Builds a one-triangle WebGPU test in the game's place: the first thing to run when Dawn or the driver changes. |
 | `vm.sh TOOL` | From macOS, runs one of the above inside a Lima VM named `ps5`. |
 | `update-dusklight.sh` | Moves to upstream Dusklight's latest revision and re-applies the patches. |
