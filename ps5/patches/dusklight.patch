@@ -1,0 +1,56 @@
+diff --git a/src/dusk/mods/loader/prepatch.cpp b/src/dusk/mods/loader/prepatch.cpp
+index 26c802a3cd..104f0f90b2 100644
+--- a/src/dusk/mods/loader/prepatch.cpp
++++ b/src/dusk/mods/loader/prepatch.cpp
+@@ -253,8 +253,13 @@ std::optional<Site> lookup(void* runtimeTarget) {
+ }
+ 
+ void publish(const Site& site, void* trampoline) {
++#if defined(__cpp_lib_atomic_ref)
+     std::atomic_ref slot{*site.slot};
+     slot.store(trampoline, std::memory_order_release);
++#else
++    // libc++ before 19 (the PS5 payload SDK's) has no std::atomic_ref
++    __atomic_store_n(site.slot, trampoline, __ATOMIC_RELEASE);
++#endif
+ }
+ 
+ }  // namespace dusk::mods::prepatch
+diff --git a/src/m_Do/m_Do_main.cpp b/src/m_Do/m_Do_main.cpp
+index 58a1f3bfbd..77206650ac 100644
+--- a/src/m_Do/m_Do_main.cpp
++++ b/src/m_Do/m_Do_main.cpp
+@@ -774,6 +774,33 @@ int game_main(int argc, char* argv[]) {
+         return dvdPathAccess ? borealis::io::fs_path_to_string(dvdPathAccess.path()) : location;
+     };
+ 
++#if defined(__PROSPERO__)
++    // PlayStation 5: there is no file dialog. With no disc image chosen yet, take the first
++    // .iso or .ciso in the title's own folder (/data/homebrew/<TITLE_ID>, all of /data a title
++    // can see), then on a USB drive.
++    if (dusk::getSettings().backend.isoPath.getValue().empty()) {
++        for (const char* dir : {"/app0", "/mnt/usb0", "/mnt/usb1"}) {
++            std::error_code ec;
++            std::string found;
++            for (std::filesystem::directory_iterator it{dir, ec}, end; !ec && it != end; it.increment(ec)) {
++                std::string extension = it->path().extension().string();
++                for (char& c : extension) {
++                    c = static_cast<char>(tolower(static_cast<unsigned char>(c)));
++                }
++                if (extension == ".iso" || extension == ".gcm" || extension == ".ciso") {
++                    found = it->path().string();
++                    break;
++                }
++            }
++            if (!found.empty()) {
++                DuskLog.info("Found a disc image: {}", found);
++                dusk::getSettings().backend.isoPath.setValue(found);
++                break;
++            }
++        }
++    }
++#endif
++
+     const std::string savedLocation = dusk::getSettings().backend.isoPath;
+     dusk::iso::DiscInfo discInfo{};
+     if (!savedLocation.empty() &&

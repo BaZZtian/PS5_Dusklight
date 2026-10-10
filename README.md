@@ -1,0 +1,203 @@
+# Dusklight for PlayStation 5
+
+[![stars](https://img.shields.io/github/stars/griches/PS5_Dusklight?style=flat)](https://github.com/griches/PS5_Dusklight/stargazers)
+[![Track Dusklight](https://github.com/griches/PS5_Dusklight/actions/workflows/track-dusklight.yml/badge.svg)](https://github.com/griches/PS5_Dusklight/actions/workflows/track-dusklight.yml)
+[![licence](https://img.shields.io/badge/licence-GPL--3.0%20as%20built-blue)](LICENSING.md)
+
+A PS5 homebrew port of [Dusklight](https://github.com/TwilitRealm/dusklight), the
+reverse-engineered reimplementation of a classic GameCube adventure. It draws
+through Dusklight's own renderer ([Aurora](https://github.com/encounter/aurora) on
+Dawn's WebGPU) on RADV, Mesa's Vulkan driver, from the
+[PS5 Vulkan](https://github.com/mihawk-99/PS5_Vulkan) stack.
+
+It needs a PS5 that already runs homebrew, and a disc image of the game that you
+provide. No game data, Nintendo artwork, Sony software or keys are included, here
+or in a build.
+
+This is an unofficial port. It is not part of the Dusklight project and is not
+supported by it: please do not take PS5 problems to them.
+
+## Status
+
+Tested on one console, on 2026-10-10 and 11, with the GameCube USA disc (GZ2E01).
+"Seen" means it ran there and was watched, or read in the console's log; nothing
+else is claimed.
+
+| Area | Seen on the console | Not yet verified |
+| --- | --- | --- |
+| Start-up | Finds the disc image in the title's folder, boots into the game | Exit back to the home screen from the game's own menu |
+| Rendering | 3840x2160 on a 59.94 Hz display, several minutes of play with no crash | Frame rate over a long session; 120 Hz; later areas of the game |
+| Saving | A memory card file is created, and a save survived closing and restarting the title | |
+| Input | A DualSense plays the game | Each button of the mapping; rumble; a second controller |
+| Sound | | Everything: the driver opens, nobody has confirmed what it sounds like |
+| Shader cache | Aurora's pipeline cache opens and is written | That it is reused after a restart |
+
+Known limits:
+
+- **Objects can appear a frame late the first time a scene shows them.** Aurora
+  compiles each new render pipeline on a worker thread and skips the draw until
+  it is ready, as it does on every platform. They are cached once compiled.
+- **Disc images: GameCube `.iso` or `.ciso` only.** Upstream reads RVZ, GCZ, WIA
+  and WBFS through a Rust library; this port has its own small reader in its
+  place (`ps5/nod/`). Wii discs are not supported.
+- **No code mods, no updater, no Discord presence, no network.** They are turned
+  off in this build.
+- **No file dialog.** The disc image is found by where it is, not chosen.
+
+## Install
+
+There is no ready-made download yet: you build the title folder (below), then
+install it like any other folder title.
+
+**What the console needs**
+
+- A PS5 that runs homebrew, with etaHEN (or an equivalent) loaded.
+- ShadowMountPlus, which shows the folders in `/data/homebrew` as titles on the
+  home screen.
+- An FTP server on the console to copy files with (port 2121 here).
+
+**Steps**
+
+1. Build the title (see Build). The result is the folder `dist/PPSA99305/`.
+2. Copy that whole folder to the console as `/data/homebrew/PPSA99305/`, so that
+   you have:
+
+   ```text
+   /data/homebrew/PPSA99305/eboot.bin
+   /data/homebrew/PPSA99305/sce_sys/      (param.json, icon0.png, pic0.dds, pic1.dds)
+   /data/homebrew/PPSA99305/sce_module/libc.prx
+   /data/homebrew/PPSA99305/res/          (fonts and the menus' documents)
+   /data/homebrew/PPSA99305/licenses/
+   ```
+
+   Copy `sce_sys/icon0.png` with the first upload: ShadowMountPlus will not
+   register a title without its icon, and after two failed tries it skips that
+   title until it is restarted.
+3. Copy your disc image into the same folder, under any name ending in `.iso` or
+   `.ciso`:
+
+   ```text
+   /data/homebrew/PPSA99305/your-disc.iso
+   ```
+
+   It has to be there, not elsewhere in `/data`: a title can only see its own
+   folder. The game takes the first image it finds and remembers it.
+4. Wait a few seconds for "Dusklight" to appear on the home screen, and start it.
+
+Saves and settings are written to `/data/homebrew/PPSA99305/userdata/`. Copying a
+new build over the folder leaves them, and the disc image, alone.
+
+**The disc image.** Dusklight's own terms apply: dump your own copy of the game
+([how](https://wiki.dolphin-emu.org/index.php?title=Ripping_Games)). If your dump
+is RVZ or another compressed format, convert it to `.iso` with
+[Dolphin](https://dolphin-emu.org/) or `nodtool` first.
+
+## Build
+
+The build runs on Linux (x86-64 or arm64; on a Mac, in a Linux VM) with Mihawk's
+stack beside this repository:
+
+```text
+somewhere/
+  PS5_Dusklight/     this repository
+  PS5_Vulkan/        https://github.com/mihawk-99/PS5_Vulkan   (with its RADV release archive built)
+  PS5_Mesa/          https://github.com/mihawk-99/PS5_Mesa
+  PS5_PayloadSDK/    https://github.com/mihawk-99/PS5_PayloadSDK
+```
+
+Set that stack up first, by its own instructions, until `PS5_Vulkan` has
+`.deps/native/radv-release/lib/libvulkan_radeon.ps5.a` and
+`build/host/ps5-native-tool`. It needs **LLVM 22**: RADV built with an older clang
+does not link into a title. Then:
+
+```sh
+git clone https://github.com/griches/PS5_Dusklight.git
+cd PS5_Dusklight
+ps5/tools/build.sh
+```
+
+`build.sh` does the rest, and the first run takes a while:
+
+1. checks out Dusklight (`vendor/dusklight`) with Aurora and Borealis, and applies
+   `ps5/patches/` to them;
+2. fetches Dawn and SDL3 at the revisions Aurora pins into `.deps/`, and patches
+   them for the console;
+3. installs the payload SDK at this port's pin;
+4. configures Dusklight's own CMake build with the SDK's toolchain and
+   `ps5/cmake/ps5-game.cmake`, compiles about 3,000 files, links with RADV and
+   writes `dist/PPSA99305/`.
+
+Other tools, all in `ps5/tools/`:
+
+| Tool | What it does |
+| --- | --- |
+| `deploy.sh` | Uploads `dist/PPSA99305/` over FTP (the console's address is `PS5_HOST` in `PS5_Vulkan/.env`). It never touches the disc image or `userdata/`. |
+| `run.sh` | Launches the title through PS5_Vulkan's control payload and follows its log; symbolises a crash. |
+| `build-triangle.sh` | Builds a one-triangle WebGPU test in the game's place: the first thing to run when Dawn or the driver changes. |
+| `vm.sh TOOL` | From macOS, runs one of the above inside a Lima VM named `ps5`. |
+| `update-dusklight.sh` | Moves to upstream Dusklight's latest revision and re-applies the patches. |
+| `check-patches.sh` | Says whether the Dawn and SDL3 patches apply to what Aurora now pins. |
+
+## Keeping up with Dusklight
+
+`vendor/dusklight` is a submodule at an upstream revision; nothing of Dusklight is
+copied or forked here. What the console needs changed in Dusklight, Aurora and
+Borealis is three small patches in `ps5/patches/`; Dawn and SDL3 have theirs
+there too.
+
+A [scheduled workflow](.github/workflows/track-dusklight.yml) runs
+`update-dusklight.sh` every day. If the patches still apply to upstream's newest
+revision, it commits that revision, so a fresh clone builds against the latest
+Dusklight the patches fit. If one does not, it commits nothing and opens an issue.
+It cannot build the game, so a revision it commits is not known to compile or
+run: the Status table above is for the revision it was tested at
+(`34a144a493`).
+
+## How it works
+
+```text
+  Dusklight (the game's code)                     vendor/dusklight
+        |
+  Aurora ........ GameCube GX, pads, cards, DVD   vendor/dusklight/extern/aurora
+        |              |               |
+      Dawn           SDL3             nod
+   (WebGPU)     ps5/sdl drivers    ps5/nod: .iso and .ciso
+        |
+  Vulkan: RADV + PS5 winsys, VK_KHR_display       PS5_Mesa, PS5_Vulkan
+        |
+  PS5 GPU
+```
+
+- **Dawn.** The fork Aurora uses already had a console port (Nintendo Switch):
+  a Vulkan driver linked into the program and a native-window surface.
+  `ps5/patches/dawn.patch` adds the PS5 beside it: RADV's entry point in place of
+  a Vulkan library, and the console's one output as a `VK_KHR_display` surface.
+- **SDL3.** Threads, time and files are FreeBSD's. `ps5/sdl/` adds a video driver
+  (one display, a window that is the screen), an audio driver (AudioOut, 48 kHz
+  stereo) and a joystick driver that presents each controller as a DualSense.
+- **nod.** Aurora reads discs through nod, a Rust library. There is no Rust
+  toolchain for the console, so `ps5/nod/nod.cpp` implements the part of nod's C
+  API that is called, for plain and CISO GameCube images.
+- **The console's quirks**, each found the hard way and explained where it is
+  handled: constructors that ran in reverse (`ps5/tools/cc-init-array.sh`), an
+  `lstat` that does not work for a title and other missing libc functions
+  (`ps5/src/shims.c`), and where a title may write (`ps5/src/startup.c`).
+
+## Credits
+
+- [Dusklight](https://github.com/TwilitRealm/dusklight) by Twilit Realm and its
+  contributors, on the [Twilight Princess decompilation](https://github.com/zeldaret/tp).
+- [Aurora](https://github.com/encounter/aurora), [Borealis](https://github.com/encounter/borealis),
+  [nod](https://github.com/encounter/nod) and the Dawn fork by Luke Street (encounter) and contributors.
+- [PS5_Vulkan](https://github.com/mihawk-99/PS5_Vulkan), [PS5_Mesa](https://github.com/mihawk-99/PS5_Mesa),
+  [PS5_PayloadSDK](https://github.com/mihawk-99/PS5_PayloadSDK) and the
+  [PS5 Vulkan Template](https://github.com/mihawk-99/PS5_VulkanTemplate) by Mihawk:
+  the driver, the platform layer and the tools this is built with.
+- [ps5-payload-dev/sdk](https://github.com/ps5-payload-dev/sdk) by John Törnblom.
+- Mesa and RADV, Dawn, SDL, and the libraries listed in [LICENSING.md](LICENSING.md).
+
+## Licence
+
+See [LICENSING.md](LICENSING.md). In short: the port's own files are MIT or Zlib,
+one tool is GPL-3.0, and a built title is GPL-3.0 because of what it links. The
+game itself is Nintendo's and is not part of this.

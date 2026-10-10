@@ -1,0 +1,15 @@
+diff --git a/src/crash.cpp b/src/crash.cpp
+index 8420ef0..9bf6db1 100644
+--- a/src/crash.cpp
++++ b/src/crash.cpp
+@@ -39,6 +39,10 @@
+ #else
+ #include <elf.h>
+ #include <link.h>
++#ifndef ElfW
++// FreeBSD and the PlayStation 5: link.h has no ElfW
++#define ElfW(type) Elf64_##type
++#endif
+ #ifndef NT_GNU_BUILD_ID
+ #define NT_GNU_BUILD_ID 3
+ #endif
