@@ -53,9 +53,10 @@ Known limits:
   data, so its hash could not match the original's anyway.
 - **The button symbols follow the default mapping.** The game draws a button as
   a coloured shape with a white letter, each letter a texture of its own; the
-  port replaces those five textures with pictures it draws (`ps5/art/make-glyphs.py`,
+  port replaces those five textures with symbols from Kenney's Input Prompts
+  (www.kenney.nl, CC0; `ps5/art/kenney/`, cut to size by `ps5/art/make-glyphs.py`,
   shipped in `res/ps5-glyphs/`, loaded as texture replacements named for the
-  USA disc's textures). They say Cross for A, Circle for B, Square for X,
+  USA disc's textures), and turns the green tint of the A button blue. They say Cross for A, Circle for B, Square for X,
   Triangle for Y and R1 for Z, which is Dusklight's default mapping: remap the
   buttons and the symbols no longer match. A replacement of your own for the
   same texture wins, and turning texture replacements off in the settings turns
@@ -216,6 +217,7 @@ run: the Status table above is for the revision it was tested at
   the driver, the platform layer and the tools this is built with.
 - [ps5-payload-dev/sdk](https://github.com/ps5-payload-dev/sdk) by John Törnblom.
 - Mesa and RADV, Dawn, SDL, and the libraries listed in [LICENSING.md](LICENSING.md).
+- Kenney (www.kenney.nl) for the button symbols, from Input Prompts (CC0).
 
 ## Licence
 

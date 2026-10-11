@@ -56,6 +56,10 @@ make the source of every part available at the revisions it was built from.
   `ps5/art/make-title-art.py`: a generated landscape, the lettering of
   Dusklight's logo (CC0, without its mascot), and Aurora's own mark. Nothing in
   them is Nintendo's.
+- **Button symbols.** `ps5/art/glyphs/` (shipped as `res/ps5-glyphs/`) is made
+  from Kenney's Input Prompts (www.kenney.nl), Creative Commons Zero:
+  `ps5/art/kenney/License.txt`. The cross, circle, square and triangle are
+  Sony's marks whoever draws them.
 - **Trademarks.** "The Legend of Zelda", "Twilight Princess", "GameCube" and
   "Nintendo" are trademarks of Nintendo. "PlayStation" and "PS5" are trademarks
   of Sony Interactive Entertainment Inc. This project is not affiliated with or
