@@ -42,7 +42,14 @@ Known limits:
   and WBFS through a Rust library; this port has its own small reader in its
   place (`ps5/nod/`). Wii discs are not supported.
 - **No code mods, no updater, no Discord presence, no network.** They are turned
-  off in this build.
+  off in this build. The mods in Dusklight's `mods/` folder (the randomizer, the
+  Luau runtime and the rest) are code mods, so none is bundled, and a mod that
+  needs the Luau runtime does not run. An asset-only `.dusk` (textures, files
+  that replace the disc's) put in `/data/homebrew/PPSA99305/mods/` is listed and
+  can be switched on in the Mods menu. Online mods cannot be browsed.
+- **"Disc not verified" on the menu is expected.** The disc is found, not
+  chosen, so it is never hashed; and a `.ciso` leaves out the disc's filler
+  data, so its hash could not match the original's anyway.
 - **No file dialog.** The disc image is found by where it is, not chosen.
 
 ## Install

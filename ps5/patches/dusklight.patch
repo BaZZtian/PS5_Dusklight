@@ -16,6 +16,49 @@ index 26c802a3cd..104f0f90b2 100644
  }
  
  }  // namespace dusk::mods::prepatch
+diff --git a/src/dusk/mods/updates.cpp b/src/dusk/mods/updates.cpp
+index 09154d018c..8a0524f22a 100644
+--- a/src/dusk/mods/updates.cpp
++++ b/src/dusk/mods/updates.cpp
+@@ -420,12 +420,12 @@ uint64_t download_size() noexcept {
+ }
+ 
+ std::string status_text() {
+-    if (!store.initialized) {
+-        return "Waiting for mods to initialize.";
+-    }
+     if (store.state == State::Unavailable) {
+         return "Online mod updates are unavailable.";
+     }
++    if (!store.initialized) {
++        return "Waiting for mods to initialize.";
++    }
+     if (store.state == State::Checking) {
+         return "Checking for mod updates…";
+     }
+diff --git a/src/dusk/ui/prelaunch.cpp b/src/dusk/ui/prelaunch.cpp
+index cadb7423e1..2c4f17cd9e 100644
+--- a/src/dusk/ui/prelaunch.cpp
++++ b/src/dusk/ui/prelaunch.cpp
+@@ -20,6 +20,7 @@
+ #include <SDL3/SDL_error.h>
+ #include <SDL3/SDL_misc.h>
+ #include <aurora/lib/window.hpp>
++#include <borealis/http.hpp>
+ #include <borealis/file_select.hpp>
+ #include <borealis/io.hpp>
+ #include <borealis/log.hpp>
+@@ -202,6 +203,10 @@ void begin_update_check() {
+     if (sUpdateCheck || sUpdateCheckResult.has_value()) {
+         return;
+     }
++    // A build with no HTTP backend has nothing to ask: say nothing rather than report a failure.
++    if (!borealis::http::available()) {
++        return;
++    }
+     sUpdateCheck = borealis::update::check_latest_github_release(AppInfo);
+ }
+ 
 diff --git a/src/m_Do/m_Do_main.cpp b/src/m_Do/m_Do_main.cpp
 index 58a1f3bfbd..77206650ac 100644
 --- a/src/m_Do/m_Do_main.cpp
