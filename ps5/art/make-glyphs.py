@@ -26,15 +26,20 @@ def canvas(w, h):
     return image, ImageDraw.Draw(image)
 
 
-def save(mask, name):
-    white = Image.new("RGBA", mask.size, (255, 255, 255, 0))
+def save(mask, name, colour=(255, 255, 255)):
+    white = Image.new("RGBA", mask.size, colour + (0,))
     white.putalpha(mask)
     # drawn large and reduced, for smooth edges
     white = white.resize((mask.width // 2, mask.height // 2), Image.LANCZOS)
     white.save(out / (name + ".png"))
 
 
-def symbol(name, w, h, kind):
+# The game's X and Y buttons are colourless shapes, so their symbols carry the colour themselves.
+PINK = (238, 150, 214)
+GREEN = (96, 214, 168)
+
+
+def symbol(name, w, h, kind, colour=(255, 255, 255)):
     mask, draw = canvas(w, h)
     cx, cy = mask.width / 2, mask.height / 2
     r = min(w, h) * SCALE * 0.40
@@ -54,7 +59,7 @@ def symbol(name, w, h, kind):
         draw.line(points + [points[0]], fill=255, width=t, joint="curve")
         for x, y in points:
             draw.ellipse([x - t / 2, y - t / 2, x + t / 2, y + t / 2], fill=255)
-    save(mask, name)
+    save(mask, name, colour)
 
 
 def text(name, w, h, label):
@@ -76,6 +81,6 @@ def text(name, w, h, label):
 symbol("tex1_32x46_683dc853245a0f36_0", 32, 46, "cross")     # A
 symbol("tex1_24x40_b191153a917b3b50_0", 24, 40, "circle")    # B
 symbol("tex1_32x45_3b03f19ac102dd38_0", 32, 45, "square")    # X
-symbol("tex1_32x40_a57e14b2809290fc_0", 32, 40, "triangle")  # Y
+symbol("tex1_32x40_a57e14b2809290fc_0", 32, 40, "triangle", GREEN)  # Y
 text("tex1_24x40_1868b6990a352fae_2", 24, 40, "R1")          # Z
 print(sorted(p.name for p in out.glob("*.png")))
