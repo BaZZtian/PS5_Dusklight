@@ -153,6 +153,9 @@ if [[ " ${objects[*]} " == *libaurora_main.a* ]]; then
     # ... with the port's own pictures over Dusklight's, which show the game
     # (ps5/art/make-title-art.py draws them)
     cp "$ps5"/art/res/*.png "$app/res/"
+    # ... and the DualSense's symbols for the game's button prompts (ps5/art/make-glyphs.py)
+    mkdir -p "$app/res/ps5-glyphs"
+    cp "$ps5"/art/glyphs/*.png "$app/res/ps5-glyphs/"
 fi
 # The licences beside eboot.bin
 mkdir -p "$app/licenses"

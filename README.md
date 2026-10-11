@@ -29,6 +29,7 @@ else is claimed.
 | Start-up | Finds the disc image in the title's folder, boots into the game | Exit back to the home screen from the game's own menu |
 | Rendering | 3840x2160 on a 59.94 Hz display, several minutes of play with no crash | Frame rate over a long session; 120 Hz; later areas of the game |
 | Saving | A memory card file is created, and a save survived closing and restarting the title | |
+| Button prompts | The DualSense's symbols on the game's buttons, on the file select and in play: Cross (A), Circle (B), Square (X), Triangle (Y), R1 (Z) | Other prompts (L, R, Start, the D-pad and stick pictures); a changed button mapping; the other regions' discs |
 | Input | A DualSense plays the game | Each button of the mapping; rumble; a second controller |
 | Sound | | Everything: the driver opens, nobody has confirmed what it sounds like |
 | Shader cache | Aurora's pipeline cache opens and is written | That it is reused after a restart |
@@ -50,6 +51,15 @@ Known limits:
 - **"Disc not verified" on the menu is expected.** The disc is found, not
   chosen, so it is never hashed; and a `.ciso` leaves out the disc's filler
   data, so its hash could not match the original's anyway.
+- **The button symbols follow the default mapping.** The game draws a button as
+  a coloured shape with a white letter, each letter a texture of its own; the
+  port replaces those five textures with pictures it draws (`ps5/art/make-glyphs.py`,
+  shipped in `res/ps5-glyphs/`, loaded as texture replacements named for the
+  USA disc's textures). They say Cross for A, Circle for B, Square for X,
+  Triangle for Y and R1 for Z, which is Dusklight's default mapping: remap the
+  buttons and the symbols no longer match. A replacement of your own for the
+  same texture wins, and turning texture replacements off in the settings turns
+  these off too.
 - **No file dialog.** The disc image is found by where it is, not chosen.
 
 ## Install

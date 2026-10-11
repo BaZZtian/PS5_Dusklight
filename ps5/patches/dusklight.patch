@@ -36,6 +36,36 @@ index 09154d018c..8a0524f22a 100644
      if (store.state == State::Checking) {
          return "Checking for mod updates…";
      }
+diff --git a/src/dusk/texture_replacements.cpp b/src/dusk/texture_replacements.cpp
+index 118989c6a7..ab5bdcf0df 100644
+--- a/src/dusk/texture_replacements.cpp
++++ b/src/dusk/texture_replacements.cpp
+@@ -9,6 +9,11 @@
+ namespace dusk::texture_replacements {
+ namespace {
+ aurora::texture::ReplacementGroup s_directoryGroup;
++#ifdef __PROSPERO__
++// PlayStation 5: the DualSense's symbols for the game's button prompts, pictures the port draws
++// and ships in the title's folder (ps5/art/make-glyphs.py). The user's own replacements win.
++aurora::texture::ReplacementGroup s_ps5GlyphGroup;
++#endif
+ }
+ 
+ void reload() {
+@@ -24,6 +29,13 @@ void reload() {
+         root, {.priority = kUserTextureReplacementPriority});
+     DuskLog.info("Texture replacement directory loaded: {} registration(s)",
+                  s_directoryGroup.registrations.size());
++#ifdef __PROSPERO__
++    aurora::texture::unregister_replacements(s_ps5GlyphGroup);
++    s_ps5GlyphGroup.registrations.clear();
++    s_ps5GlyphGroup = aurora::texture::load_replacement_directory(
++        "/app0/res/ps5-glyphs", {.priority = kUserTextureReplacementPriority - 2});
++    DuskLog.info("PS5 button glyphs: {} registration(s)", s_ps5GlyphGroup.registrations.size());
++#endif
+ }
+ 
+ void shutdown() {
 diff --git a/src/dusk/ui/prelaunch.cpp b/src/dusk/ui/prelaunch.cpp
 index cadb7423e1..2c4f17cd9e 100644
 --- a/src/dusk/ui/prelaunch.cpp
@@ -60,10 +90,43 @@ index cadb7423e1..2c4f17cd9e 100644
  }
  
 diff --git a/src/m_Do/m_Do_main.cpp b/src/m_Do/m_Do_main.cpp
-index 58a1f3bfbd..77206650ac 100644
+index 58a1f3bfbd..0d91eff36f 100644
 --- a/src/m_Do/m_Do_main.cpp
 +++ b/src/m_Do/m_Do_main.cpp
-@@ -774,6 +774,33 @@ int game_main(int argc, char* argv[]) {
+@@ -4,6 +4,10 @@
+  * PC Port Version - based on Aurora integration from Vorversion
+  */
+ 
++#ifdef __PROSPERO__
++#include <sys/stat.h>
++#include <unistd.h>
++#endif
+ #include "m_Do/m_Do_main.h"
+ #include "DynamicLink.h"
+ #include "JSystem/JAudio2/JASAudioThread.h"
+@@ -707,7 +711,21 @@ int game_main(int argc, char* argv[]) {
+         config.allowJoystickBackgroundEvents = dusk::getSettings().game.allowBackgroundInput;
+         config.pauseOnFocusLost = dusk::getSettings().game.pauseOnFocusLost;
+         config.imGuiInitCallback = &aurora_imgui_init_callback;
++#ifdef __PROSPERO__
++        // PlayStation 5: a file named texture-dumps in the title's folder turns Aurora's texture
++        // dumps on (into the cache folder's texture_dumps), to find what a replacement must be named
++        config.allowTextureDumps = access("/app0/texture-dumps", F_OK) == 0;
++        if (config.allowTextureDumps) {
++            // ... and lets FTP read them: the title's data folders are its owner's alone otherwise
++            for (const char* dir : {"/app0/userdata", "/app0/userdata/TwilitRealm", "/app0/userdata/TwilitRealm/Dusklight",
++                                    "/app0/userdata/TwilitRealm/Dusklight/texture_dumps"}) {
++                mkdir(dir, 0777);
++                chmod(dir, 0777);
++            }
++        }
++#else
+         config.allowTextureDumps = false;
++#endif
+         auroraInfo = aurora_initialize(argc, argv, &config);
+     }
+ 
+@@ -774,6 +792,33 @@ int game_main(int argc, char* argv[]) {
          return dvdPathAccess ? borealis::io::fs_path_to_string(dvdPathAccess.path()) : location;
      };
  
