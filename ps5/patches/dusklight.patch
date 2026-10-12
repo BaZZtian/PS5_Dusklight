@@ -115,10 +115,17 @@ index 09154d018c..8a0524f22a 100644
          return "Checking for mod updates…";
      }
 diff --git a/src/dusk/texture_replacements.cpp b/src/dusk/texture_replacements.cpp
-index 118989c6a7..ab5bdcf0df 100644
+index 118989c6a7..ddfbe2e147 100644
 --- a/src/dusk/texture_replacements.cpp
 +++ b/src/dusk/texture_replacements.cpp
-@@ -9,6 +9,11 @@
+@@ -6,9 +6,18 @@
+ #include "dusk/main.h"
+ #include "dusk/settings.h"
+ 
++#ifdef __PROSPERO__
++#include <sys/stat.h>
++#endif
++
  namespace dusk::texture_replacements {
  namespace {
  aurora::texture::ReplacementGroup s_directoryGroup;
@@ -130,11 +137,14 @@ index 118989c6a7..ab5bdcf0df 100644
  }
  
  void reload() {
-@@ -24,6 +29,13 @@ void reload() {
+@@ -24,6 +33,16 @@ void reload() {
          root, {.priority = kUserTextureReplacementPriority});
      DuskLog.info("Texture replacement directory loaded: {} registration(s)",
                   s_directoryGroup.registrations.size());
 +#ifdef __PROSPERO__
++    // PlayStation 5: the folder is made for the title's user alone, and the console's FTP server
++    // is another: let it in, or nobody can copy a texture there.
++    chmod(root.c_str(), 0777);
 +    aurora::texture::unregister_replacements(s_ps5GlyphGroup);
 +    s_ps5GlyphGroup.registrations.clear();
 +    s_ps5GlyphGroup = aurora::texture::load_replacement_directory(

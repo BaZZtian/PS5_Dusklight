@@ -61,6 +61,19 @@ Known limits:
   buttons and the symbols no longer match. A replacement of your own for the
   same texture wins, and turning texture replacements off in the settings turns
   these off too.
+- **Texture packs: loose files or a `.dusk`, `.png` or `.dds`.** Files named the
+  way Dolphin names them (`tex1_256x128_e6a4c7be9bf48305_14.dds`) are picked up
+  from `/data/homebrew/PPSA99305/userdata/TwilitRealm/Dusklight/texture_replacements/`
+  and its subfolders, or from the `textures/` folder of a `.dusk`. A `.dds` may
+  be uncompressed 32-bit RGBA or BGRA, BC1 (DXT1), BC3 (DXT5), BC5 or BC7, with
+  or without mipmaps; this port also takes the sRGB-tagged variants of those,
+  which upstream refuses. BC2 (DXT3), BC4, BC6H and ASTC are not loaded, and a
+  compressed texture's width and height must be multiples of 4. Seen on the
+  console on 2026-10-12 with three test files in the loose folder: BC7 tagged
+  sRGB with mipmaps, DXT5, and uncompressed RGBA; a real texture pack has not
+  been tried. The game makes that folder at its first start, and from this
+  build on opens it to the FTP server at every start: with v0.2.0 an upload
+  into it is refused until the folder's permissions are changed.
 - **No file dialog.** The disc image is found by where it is, not chosen.
 
 ## Install

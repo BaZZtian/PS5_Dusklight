@@ -9,7 +9,8 @@
 #
 #   ps5/patches/dusklight.patch  the disc image found in the title's folder (no
 #                                file dialog), and std::atomic_ref for libc++ 18
-#   ps5/patches/aurora.patch     the console's surface for Dawn
+#   ps5/patches/aurora.patch     the console's surface for Dawn, and .dds texture
+#                                replacements saved as sRGB
 #   ps5/patches/borealis.patch   ElfW for a FreeBSD's link.h
 #
 # A patch already applied is left alone, so this can run before every build.
