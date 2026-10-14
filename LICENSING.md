@@ -50,12 +50,15 @@ make the source of every part available at the revisions it was built from.
   can only give away what is theirs. The code is a reimplementation derived from
   a decompilation of Nintendo's game; whether and where that is lawful to use or
   share is not something these licences settle.
-- **Artwork.** `ps5/sce_sys/icon0.png`, `pic0.dds`, `pic1.dds` and the menu
-  pictures in `ps5/art/res/` (which a built title carries in place of
-  Dusklight's own logo, icon, emblem and pre-launch background) are drawn by
-  `ps5/art/make-title-art.py`: a generated landscape, the lettering of
-  Dusklight's logo (CC0, without its mascot), and Aurora's own mark. Nothing in
-  them is Nintendo's.
+- **Artwork.** `ps5/sce_sys/icon0.png`, `pic0.dds` and `pic1.dds` come from
+  `ps5/art/icon0-source.png` and `ps5/art/pic-source.jpg`, the port's own
+  pictures (a young swordsman and a black wolf split by a seam of twilight, over
+  carved stone, made for it by Gary Riches with an image generator): nothing in
+  them is from the game. The menu pictures
+  in `ps5/art/res/` (which a built title carries in place of Dusklight's own
+  logo, icon, emblem and pre-launch background) are drawn by
+  `ps5/art/make-title-art.py`: a generated landscape and the lettering of
+  Dusklight's logo (CC0, without its mascot). Nothing in them is Nintendo's.
 - **Button symbols.** `ps5/art/glyphs/` (shipped as `res/ps5-glyphs/`) is made
   from Kenney's Input Prompts (www.kenney.nl), Creative Commons Zero:
   `ps5/art/kenney/License.txt`. The cross, circle, square and triangle are

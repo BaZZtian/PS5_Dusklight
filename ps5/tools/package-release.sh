@@ -79,8 +79,8 @@ Compiler: $(${PS5_CLANG:-clang} --version | head -1)
 
 No game data is included. The Legend of Zelda: Twilight Princess belongs to
 Nintendo; this title does nothing without a GameCube disc image (.iso or .ciso)
-that you provide, placed beside eboot.bin. The pictures in sce_sys/ are drawn by
-the port's ps5/art/make-title-art.py and contain nothing of Nintendo's.
+that you provide, placed beside eboot.bin. The pictures in sce_sys/ are the
+port's own, made for it with an image generator; nothing in them is from the game.
 
 eboot.bin sha256: $(sha256sum "$app/eboot.bin" | cut -d' ' -f1)
 SOURCE
