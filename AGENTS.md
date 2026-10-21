@@ -69,3 +69,8 @@ pull request, build, release, and Store/catalog submission.**
   established: **do not publish, package, merge, or submit a release**.
 - Do not bypass these rules to meet a deadline. This document is operational
   guidance only: it does not itself license, transfer, or revoke any copyright.
+
+## 4. Project-specific known rights (not a complete legal audit)
+
+- Fork of `griches/PS5_Dusklight`. `TwilitRealm/dusklight` declares CC0 for its contributions; the PS5 application has documented GPL component obligations.
+- Credit original engine and PS5-port authors separately. No Nintendo game assets are licensed by these sources.
